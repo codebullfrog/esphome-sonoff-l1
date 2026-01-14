@@ -9,13 +9,10 @@ namespace sonoff_l1 {
 
 class SonoffL1 : public Component, public light::LightOutput {
  public:
-  // Core LightOutput API
   void write_state(light::LightState *state) override;
 
-  // Effect registration (Option A)
   void add_effect(const std::string &name, const std::string &id);
 
-  // Serial control helpers (your existing methods)
   void set_mode_gradient();
   void set_mode_breath();
   void set_mode_rgb_gradient();
