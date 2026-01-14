@@ -1,5 +1,7 @@
 #include "sonoff_l1.h"
 #include "esphome/core/log.h"
+#include "esphome/components/light/effects/lambda.h"
+
 
 namespace esphome {
 namespace sonoff_l1 {
