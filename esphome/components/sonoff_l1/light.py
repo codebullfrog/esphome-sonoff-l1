@@ -5,8 +5,12 @@ from esphome.const import CONF_ID
 
 from . import SonoffL1, CONF_SONOFF_L1_ID
 
+# Allow an effects list with no validation
+CONF_EFFECTS = "effects"
+
 CONFIG_SCHEMA = light.LIGHT_SCHEMA.extend({
     cv.GenerateID(CONF_SONOFF_L1_ID): cv.declare_id(SonoffL1),
+    cv.Optional(CONF_EFFECTS, default=[]): cv.ensure_list(cv.string),
 })
 
 async def to_code(config):
@@ -14,11 +18,6 @@ async def to_code(config):
     await cg.register_component(var, config)
     await light.register_light(var, config)
 
-    # Register effects (Option A)
-    cg.add(var.add_effect("Colorful Gradient", "gradient"))
-    cg.add(var.add_effect("Colorful Breath", "breath"))
-    cg.add(var.add_effect("RGB Gradient", "rgb_gradient"))
-    cg.add(var.add_effect("RGB Pulse", "rgb_pulse"))
-    cg.add(var.add_effect("RGB Breath", "rgb_breath"))
-    cg.add(var.add_effect("RGB Strobe", "rgb_strobe"))
-    cg.add(var.add_effect("Sound Reactive", "sync"))
+    # Register effects
+    for effect in config.get(CONF_EFFECTS, []):
+        cg.add(var.add_effect(effect.replace("_", " ").title(), effect))
