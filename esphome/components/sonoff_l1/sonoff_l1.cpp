@@ -18,11 +18,7 @@ void SonoffL1::write_state(light::LightState *state) {
 }
 
 // REQUIRED
-light::LightTraits SonoffL1::get_traits() {
-  light::LightTraits traits;
-  traits.set_supports_rgb(true);
-  traits.set_supports_brightness(true);
-  return traits;
+light::LightTraits SonoffL1::get_traits() { light::LightTraits traits; traits.set_supported_color_modes({light::ColorMode::RGB}); return traits; }
 }
 
 // Optional mode helpers
