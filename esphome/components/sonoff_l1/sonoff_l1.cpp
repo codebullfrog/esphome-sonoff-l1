@@ -15,12 +15,17 @@ void SonoffL1::write_state(light::LightState *state) {
   int bi = int(b * 255.0f);
 
   ESP_LOGD(TAG, "Setting RGB: %d %d %d", ri, gi, bi);
-
-  // Example:
-  // this->send_at_command("AT+COLOR=%02X%02X%02X", ri, gi, bi);
 }
 
-// Keep your mode functions if you want them later
+// REQUIRED
+light::LightTraits SonoffL1::get_traits() {
+  light::LightTraits traits;
+  traits.set_supports_rgb(true);
+  traits.set_supports_brightness(true);
+  return traits;
+}
+
+// Optional mode helpers
 void SonoffL1::set_mode_gradient() { ESP_LOGD(TAG, "gradient"); }
 void SonoffL1::set_mode_breath() { ESP_LOGD(TAG, "breath"); }
 void SonoffL1::set_mode_rgb_gradient() { ESP_LOGD(TAG, "rgb_gradient"); }
