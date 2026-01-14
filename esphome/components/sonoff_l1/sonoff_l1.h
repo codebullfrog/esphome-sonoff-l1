@@ -10,7 +10,10 @@ class SonoffL1 : public Component, public light::LightOutput {
  public:
   void write_state(light::LightState *state) override;
 
-  // You can keep your mode functions if you want to call them manually later
+  // REQUIRED to make the class non-abstract
+  light::LightTraits get_traits() override;
+
+  // Optional mode helpers
   void set_mode_gradient();
   void set_mode_breath();
   void set_mode_rgb_gradient();
