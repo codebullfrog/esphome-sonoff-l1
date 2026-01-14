@@ -7,21 +7,15 @@ namespace sonoff_l1 {
 static const char *const TAG = "sonoff_l1";
 
 void SonoffL1::write_state(light::LightState *state) {
-  float r, g, b;
-  state->current_values_as_rgb(&r, &g, &b);
-
-  int ri = int(r * 255.0f);
-  int gi = int(g * 255.0f);
-  int bi = int(b * 255.0f);
-
-  ESP_LOGD(TAG, "Setting RGB: %d %d %d", ri, gi, bi);
+  // ...
 }
 
-// REQUIRED
-light::LightTraits SonoffL1::get_traits() { light::LightTraits traits; traits.set_supported_color_modes({light::ColorMode::RGB}); return traits; }
+light::LightTraits SonoffL1::get_traits() {
+  light::LightTraits traits;
+  traits.set_supported_color_modes({light::ColorMode::RGB});
+  return traits;
 }
 
-// Optional mode helpers
 void SonoffL1::set_mode_gradient() { ESP_LOGD(TAG, "gradient"); }
 void SonoffL1::set_mode_breath() { ESP_LOGD(TAG, "breath"); }
 void SonoffL1::set_mode_rgb_gradient() { ESP_LOGD(TAG, "rgb_gradient"); }
