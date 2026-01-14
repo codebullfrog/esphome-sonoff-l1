@@ -1,6 +1,6 @@
 import esphome.codegen as cg
 import esphome.config_validation as cv
-from esphome.components import light, uart
+from esphome.components import uart, light
 from esphome.const import CONF_ID
 
 sonoff_l1_ns = cg.esphome_ns.namespace("sonoff_l1")
