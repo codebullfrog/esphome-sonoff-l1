@@ -26,6 +26,7 @@ class SonoffL1 : public Component, public light::LightOutput, public uart::UARTD
   SonoffL1() = default;
 
   // ESPHome overrides
+  void setup() override;
   light::LightTraits get_traits() override;
   void write_state(light::LightState *state) override;
 
@@ -40,6 +41,8 @@ class SonoffL1 : public Component, public light::LightOutput, public uart::UARTD
 
  protected:
   void send_update(const char *payload);
+
+  bool initialized_ = false;  // prevents UART writes before WiFi/API are ready
 };
 
 }  // namespace sonoff_l1
