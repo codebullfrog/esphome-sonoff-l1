@@ -5,10 +5,13 @@ from esphome.const import CONF_ID
 
 from . import SonoffL1, CONF_SONOFF_L1_ID
 
-# Allow an effects list with no validation
 CONF_EFFECTS = "effects"
 
-CONFIG_SCHEMA = light.LIGHT_SCHEMA.extend({
+# Start with a copy of LIGHT_SCHEMA but remove the built‑in effects key
+BASE_SCHEMA = light.LIGHT_SCHEMA.copy()
+BASE_SCHEMA.pop(CONF_EFFECTS, None)
+
+CONFIG_SCHEMA = BASE_SCHEMA.extend({
     cv.GenerateID(CONF_SONOFF_L1_ID): cv.declare_id(SonoffL1),
     cv.Optional(CONF_EFFECTS, default=[]): cv.ensure_list(cv.string),
 })
