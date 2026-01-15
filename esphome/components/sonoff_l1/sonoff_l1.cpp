@@ -6,12 +6,13 @@ namespace sonoff_l1 {
 static const char *const TAG = "sonoff_l1";
 
 void SonoffL1::setup() {
-  // Delay Serial init slightly so WiFi/API can come up cleanly
-  App.schedule_callback([this]() {
+  this->schedule_callback([this]() {
     ESP_LOGI(TAG, "Initializing Serial for Sonoff L1 at 19200 baud");
     Serial.begin(19200);
     this->initialized_ = true;
   });
+}
+
 }
 
 light::LightTraits SonoffL1::get_traits() {
