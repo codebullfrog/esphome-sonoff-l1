@@ -6,13 +6,12 @@ namespace sonoff_l1 {
 static const char *const TAG = "sonoff_l1";
 
 void SonoffL1::setup() {
-  this->schedule_callback([this]() {
+  // Modern ESPHome: use set_timeout instead of App.schedule_callback
+  this->set_timeout(10, [this]() {
     ESP_LOGI(TAG, "Initializing Serial for Sonoff L1 at 19200 baud");
     Serial.begin(19200);
     this->initialized_ = true;
   });
-}
-
 }
 
 light::LightTraits SonoffL1::get_traits() {
