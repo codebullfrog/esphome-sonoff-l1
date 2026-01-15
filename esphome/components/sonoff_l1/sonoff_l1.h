@@ -2,14 +2,15 @@
 
 #include "esphome/core/component.h"
 #include "esphome/components/light/light_output.h"
-#include "esphome/components/uart/uart.h"
+#include "esphome/core/log.h"
+#include "Arduino.h"
 
 namespace esphome {
 namespace sonoff_l1 {
 
-class SonoffL1 : public Component, public light::LightOutput, public uart::UARTDevice {
+class SonoffL1 : public Component, public light::LightOutput {
  public:
-  // Mode constants
+  // Mode constants (same as original)
   static const int MODE_COLORFUL = 1;
   static const int MODE_COLORFUL_GRADIENT = 2;
   static const int MODE_COLORFUL_BREATH = 3;
@@ -25,12 +26,11 @@ class SonoffL1 : public Component, public light::LightOutput, public uart::UARTD
 
   SonoffL1() = default;
 
-  // ESPHome overrides
   void setup() override;
   light::LightTraits get_traits() override;
   void write_state(light::LightState *state) override;
 
-  // Effect methods
+  // Effect methods (for use from YAML lambdas)
   void set_mode_gradient();
   void set_mode_breath();
   void set_mode_rgb_gradient();
@@ -40,9 +40,9 @@ class SonoffL1 : public Component, public light::LightOutput, public uart::UARTD
   void set_mode_sync(int sensitive = 10, int speed = 50);
 
  protected:
-  void send_update(const char *payload);
+  void send_update_(const char *payload);
 
-  bool initialized_ = false;  // prevents UART writes before WiFi/API are ready
+  bool initialized_{false};
 };
 
 }  // namespace sonoff_l1
