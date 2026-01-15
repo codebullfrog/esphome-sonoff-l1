@@ -1,5 +1,4 @@
 #include "sonoff_l1.h"
-#include "esphome/core/log.h"
 
 namespace esphome {
 namespace sonoff_l1 {
@@ -7,9 +6,10 @@ namespace sonoff_l1 {
 static const char *const TAG = "sonoff_l1";
 
 void SonoffL1::setup() {
-  // Delay UART usage until WiFi + API are fully initialized
+  // Delay Serial init slightly so WiFi/API can come up cleanly
   App.schedule_callback([this]() {
-    ESP_LOGI(TAG, "Sonoff L1 UART initialized");
+    ESP_LOGI(TAG, "Initializing Serial for Sonoff L1 at 19200 baud");
+    Serial.begin(19200);
     this->initialized_ = true;
   });
 }
@@ -20,123 +20,124 @@ light::LightTraits SonoffL1::get_traits() {
   return traits;
 }
 
-void SonoffL1::send_update(const char *payload) {
+void SonoffL1::send_update_(const char *payload) {
   if (!this->initialized_) {
-    ESP_LOGW(TAG, "UART not ready, skipping send");
+    ESP_LOGW(TAG, "Sonoff L1 not initialized yet, skipping send");
     return;
   }
 
-  this->write_str(payload);
-  this->write_byte(0x1B);  // Sonoff L1 terminator
+  Serial.print(payload);
+  Serial.write(0x1B);  // Sonoff L1 terminator
+  Serial.flush();
 }
 
 void SonoffL1::write_state(light::LightState *state) {
   if (!this->initialized_) return;
 
-  float r, g, b;
-  state->current_values_as_rgb(&r, &g, &b);
+  float red, green, blue;
+  state->current_values_as_rgb(&red, &green, &blue);
 
-  int ri = int(r * 255);
-  int gi = int(g * 255);
-  int bi = int(b * 255);
+  int red_value = int(red * 255.0f);
+  int green_value = int(green * 255.0f);
+  int blue_value = int(blue * 255.0f);
 
-  bool on;
-  state->current_values_as_binary(&on);
+  bool led_state;
+  state->current_values_as_binary(&led_state);
 
-  float br;
-  state->current_values_as_brightness(&br);
-  int brightness = int(br * 100);
+  float brightness_percent;
+  state->current_values_as_brightness(&brightness_percent);
+  int brightness = int(brightness_percent * 100.0f);
 
   char buffer[180];
   snprintf(buffer, sizeof(buffer),
            "AT+UPDATE=\"sequence\":\"%d%03d\",\"switch\":\"%s\",\"light_type\":1,"
            "\"colorR\":%d,\"colorG\":%d,\"colorB\":%d,\"bright\":%d,\"mode\":%d",
            millis(), millis() % 1000,
-           on ? "on" : "off",
-           ri, gi, bi,
+           led_state ? "on" : "off",
+           red_value, green_value, blue_value,
            brightness,
            MODE_COLORFUL);
 
-  ESP_LOGD(TAG, "Sending update: %s", buffer);
-  send_update(buffer);
+  ESP_LOGD(TAG, "Sending state update: %s", buffer);
+  send_update_(buffer);
 }
 
 void SonoffL1::set_mode_gradient() {
   if (!this->initialized_) return;
 
-  char buffer[80];
+  char buffer[120];
   snprintf(buffer, sizeof(buffer),
            "AT+UPDATE=\"sequence\":\"%d%03d\",\"mode\":%d",
            millis(), millis() % 1000,
            MODE_COLORFUL_GRADIENT);
-  send_update(buffer);
+  send_update_(buffer);
 }
 
 void SonoffL1::set_mode_breath() {
   if (!this->initialized_) return;
 
-  char buffer[80];
+  char buffer[120];
   snprintf(buffer, sizeof(buffer),
            "AT+UPDATE=\"sequence\":\"%d%03d\",\"mode\":%d",
            millis(), millis() % 1000,
            MODE_COLORFUL_BREATH);
-  send_update(buffer);
+  send_update_(buffer);
 }
 
 void SonoffL1::set_mode_rgb_gradient() {
   if (!this->initialized_) return;
 
-  char buffer[80];
+  char buffer[120];
   snprintf(buffer, sizeof(buffer),
            "AT+UPDATE=\"sequence\":\"%d%03d\",\"mode\":%d",
            millis(), millis() % 1000,
            MODE_RGB_GRADIENT);
-  send_update(buffer);
+  send_update_(buffer);
 }
 
 void SonoffL1::set_mode_rgb_pulse() {
   if (!this->initialized_) return;
 
-  char buffer[80];
+  char buffer[120];
   snprintf(buffer, sizeof(buffer),
            "AT+UPDATE=\"sequence\":\"%d%03d\",\"mode\":%d",
            millis(), millis() % 1000,
            MODE_RGB_PULSE);
-  send_update(buffer);
+  send_update_(buffer);
 }
 
 void SonoffL1::set_mode_rgb_breath() {
   if (!this->initialized_) return;
 
-  char buffer[80];
+  char buffer[120];
   snprintf(buffer, sizeof(buffer),
            "AT+UPDATE=\"sequence\":\"%d%03d\",\"mode\":%d",
            millis(), millis() % 1000,
            MODE_RGB_BREATH);
-  send_update(buffer);
+  send_update_(buffer);
 }
 
 void SonoffL1::set_mode_rgb_strobe() {
   if (!this->initialized_) return;
 
-  char buffer[80];
+  char buffer[120];
   snprintf(buffer, sizeof(buffer),
            "AT+UPDATE=\"sequence\":\"%d%03d\",\"mode\":%d",
            millis(), millis() % 1000,
            MODE_RGB_STROBE);
-  send_update(buffer);
+  send_update_(buffer);
 }
 
 void SonoffL1::set_mode_sync(int sensitive, int speed) {
   if (!this->initialized_) return;
 
-  char buffer[120];
+  char buffer[160];
   snprintf(buffer, sizeof(buffer),
            "AT+UPDATE=\"sequence\":\"%d%03d\",\"mode\":%d,\"sensitive\":%d,\"speed\":%d",
            millis(), millis() % 1000,
            MODE_SYNC_TO_MUSIC,
            sensitive, speed);
-  send_update(buffer);
+  send_update_(buffer);
 }
 
 }  // namespace sonoff_l1
