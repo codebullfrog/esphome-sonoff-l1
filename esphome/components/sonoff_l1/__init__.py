@@ -10,5 +10,4 @@ CONF_SONOFF_L1_ID = "sonoff_l1_id"
 
 CONFIG_SCHEMA = light.LIGHT_SCHEMA.extend({
     cv.GenerateID(CONF_SONOFF_L1_ID): cv.declare_id(SonoffL1),
-    cv.Optional("effects"): cv.ensure_list(light.EFFECT_SCHEMA),
 })
