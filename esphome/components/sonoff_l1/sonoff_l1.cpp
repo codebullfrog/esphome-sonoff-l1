@@ -23,16 +23,15 @@ sonoff_l1::sonoff_l1() {
 
 }
 
-void sonoff_l1::setup() {
-  // Modern ESPHome: use set_timeout instead of App.schedule_callback
-  this->set_timeout(10, [this]() {
-    ESP_LOGI(TAG, "Initializing Serial for Sonoff L1 at 19200 baud");
-    Serial.begin(19200);
-    this->initialized_ = true;
-  });
+void sonoff_l1::setup() { 
+  ESP_LOGI(TAG, "Initializing Sonoff L1 UART");
+  this->initialized_ = true;
+}  
+
+void SonoffL1::setup_state(light::LightState *state) {
+  this->state_ = state;
 }
 
-void setup_state(light::LightState *state) override;
 void write_state(light::LightState *state) {
   if (!this->initialized_) return;
 
@@ -71,6 +70,9 @@ light::LightTraits sonoff_l1::get_traits() {
 }
 
 void sonoff_l1::dump_config() {
+  ESP_LOGCONFIG(TAG, "Sonoff L1 Light:");
+  LOG_UART(" ", "UART", this);
+  LOG_LIGHT(" ", "Light", this);
 }
 
 void sonoff_l1::set_mode_colorful(){
@@ -164,10 +166,9 @@ void sonoff_l1::send_update_(const char *payload) {
     ESP_LOGW(TAG, "Sonoff L1 not initialized yet, skipping send");
     return;
   }
-
-  Serial.print(payload);
-  Serial.write(0x1B);  // Sonoff L1 terminator
-  Serial.flush();
+  ESP_LOGV(TAG, "UART TX: %s", payload);
+  this->write_str(payload);
+  this->write_byte(0x1B);
 }
 
 
