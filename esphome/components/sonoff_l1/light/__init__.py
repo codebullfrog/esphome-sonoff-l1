@@ -3,8 +3,6 @@ import esphome.codegen as cg
 from esphome.components import light, uart
 from esphome.const import CONF_ID
 
-DOMAIN = "sonoff_l1"
-
 CODEOWNERS = ["@codebullfrog"]
 DEPENDENCIES = ["uart"]
 AUTO_LOAD = ["light"]
@@ -12,7 +10,7 @@ MULTI_CONF = True
 
 # C++ namespace
 ns = cg.esphome_ns.namespace("sonoff_l1")
-SonoffL1 = ns.class_("SonoffL1", cg.Component, light.LightOutput, uart.UARTDevice)
+SonoffL1 = ns.class_("SonoffL1", light.LightOutput, uart.UARTDevice)
 
 CONF_SONOFF_L1_ID = "sonoff_l1_id"
 
