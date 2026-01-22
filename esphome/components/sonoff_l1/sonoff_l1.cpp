@@ -1,3 +1,4 @@
+#include "esphome/core/log.h"
 #include "sonoff_l1.h"
 
 namespace esphome {
