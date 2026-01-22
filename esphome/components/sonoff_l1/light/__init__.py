@@ -3,6 +3,8 @@ import esphome.codegen as cg
 from esphome.components import light, uart
 from esphome.const import CONF_ID
 
+DOMAIN = "sonoff_l1"
+
 CODEOWNERS = ["@codebullfrog"]
 DEPENDENCIES = ["uart"]
 AUTO_LOAD = ["light"]
