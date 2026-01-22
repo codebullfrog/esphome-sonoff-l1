@@ -5,7 +5,7 @@ namespace esphome {
 namespace sonoff_l1 {
 
 static const char *const TAG = "sonoff_l1";
-//constants for different modes (from old custom component)
+
 static const int MODE_COLORFUL = 1;
 static const int MODE_COLORFUL_GRADIENT = 2;
 static const int MODE_COLORFUL_BREATH = 3;
@@ -19,11 +19,11 @@ static const int MODE_RGB_BREATH = 10;
 static const int MODE_RGB_STROBE = 11;
 static const int MODE_SYNC_TO_MUSIC = 12;
 
-sonoff_l1::sonoff_l1() {
+SonoffL1::SonoffL1() {
 
 }
 
-void sonoff_l1::setup() { 
+void SonoffL1::setup() { 
   ESP_LOGI(TAG, "Initializing Sonoff L1 UART");
   this->initialized_ = true;
 }  
@@ -32,7 +32,7 @@ void SonoffL1::setup_state(light::LightState *state) {
   this->state_ = state;
 }
 
-void write_state(light::LightState *state) {
+void SonoffL1::write_state(light::LightState *state) {
   if (!this->initialized_) return;
 
   float red, green, blue;
@@ -63,105 +63,117 @@ void write_state(light::LightState *state) {
   send_update_(buffer);
 }
 
-light::LightTraits sonoff_l1::get_traits() {
+light::LightTraits SonoffL1::get_traits() {
   light::LightTraits traits;
   traits.set_supported_color_modes({light::ColorMode::RGB});
   return traits;
 }
 
-void sonoff_l1::dump_config() {
+void SonoffL1::dump_config() {
   ESP_LOGCONFIG(TAG, "Sonoff L1 Light:");
   LOG_UART(" ", "UART", this);
   LOG_LIGHT(" ", "Light", this);
 }
 
-void sonoff_l1::set_mode_colorful(){
+void SonoffL1::set_mode_colorful(){
   if (!this->initialized_) return;
 
   char buffer[120];
   snprintf(buffer, sizeof(buffer),"AT+UPDATE=\"sequence\":\"%d%03d\",\"mode\":%d",millis(), millis() % 1000,MODE_COLORFUL);
   send_update_(buffer);
 }
-void sonoff_l1::set_mode_colorful_gradient(){
+
+void SonoffL1::set_mode_colorful_gradient(){
   if (!this->initialized_) return;
 
   char buffer[120];
   snprintf(buffer, sizeof(buffer),"AT+UPDATE=\"sequence\":\"%d%03d\",\"mode\":%d",millis(), millis() % 1000,MODE_COLORFUL_GRADIENT);
   send_update_(buffer);
 }
-void sonoff_l1::set_mode_colorful_breath(){
+
+void SonoffL1::set_mode_colorful_breath(){
   if (!this->initialized_) return;
 
   char buffer[120];
   snprintf(buffer, sizeof(buffer),"AT+UPDATE=\"sequence\":\"%d%03d\",\"mode\":%d",millis(), millis() % 1000,MODE_COLORFUL_BREATH);
   send_update_(buffer);
 }
-void sonoff_l1::set_mode_diy_gradient(){
+
+void SonoffL1::set_mode_diy_gradient(){
   if (!this->initialized_) return;
 
   char buffer[120];
   snprintf(buffer, sizeof(buffer),"AT+UPDATE=\"sequence\":\"%d%03d\",\"mode\":%d",millis(), millis() % 1000,MODE_DIY_GRADIENT);
   send_update_(buffer);
 }
-void sonoff_l1::set_mode_diy_pulse(){
+
+void SonoffL1::set_mode_diy_pulse(){
   if (!this->initialized_) return;
 
   char buffer[120];
   snprintf(buffer, sizeof(buffer),"AT+UPDATE=\"sequence\":\"%d%03d\",\"mode\":%d",millis(), millis() % 1000,MODE_DIY_PULSE);
   send_update_(buffer);
 }
-void sonoff_l1::set_mode_diy_breath(){
+
+void SonoffL1::set_mode_diy_breath(){
   if (!this->initialized_) return;
 
   char buffer[120];
   snprintf(buffer, sizeof(buffer),"AT+UPDATE=\"sequence\":\"%d%03d\",\"mode\":%d",millis(), millis() % 1000,MODE_DIY_BREATH);
   send_update_(buffer);
 }
-void sonoff_l1::set_mode_diy_strobe(){
+
+void SonoffL1::set_mode_diy_strobe(){
   if (!this->initialized_) return;
 
   char buffer[120];
   snprintf(buffer, sizeof(buffer),"AT+UPDATE=\"sequence\":\"%d%03d\",\"mode\":%d",millis(), millis() % 1000,MODE_DIY_STROBE);
   send_update_(buffer);
 }
-void sonoff_l1::set_mode_rgb_gradient(){
+
+void SonoffL1::set_mode_rgb_gradient(){
   if (!this->initialized_) return;
 
   char buffer[120];
   snprintf(buffer, sizeof(buffer),"AT+UPDATE=\"sequence\":\"%d%03d\",\"mode\":%d",millis(), millis() % 1000,MODE_RGB_GRADIENT);
   send_update_(buffer);
 }
-void sonoff_l1::set_mode_rgb_pulse(){
+
+void SonoffL1::set_mode_rgb_pulse(){
   if (!this->initialized_) return;
 
   char buffer[120];
   snprintf(buffer, sizeof(buffer),"AT+UPDATE=\"sequence\":\"%d%03d\",\"mode\":%d",millis(), millis() % 1000,MODE_RGB_PULSE);
   send_update_(buffer);
 }
-void sonoff_l1::set_mode_rgb_breath(){
+
+void SonoffL1::set_mode_rgb_breath(){
   if (!this->initialized_) return;
 
   char buffer[120];
   snprintf(buffer, sizeof(buffer),"AT+UPDATE=\"sequence\":\"%d%03d\",\"mode\":%d",millis(), millis() % 1000,MODE_RGB_BREATH);
   send_update_(buffer);
 }
-void sonoff_l1::set_mode_rgb_strobe(){
+
+void SonoffL1::set_mode_rgb_strobe(){
   if (!this->initialized_) return;
 
   char buffer[120];
   snprintf(buffer, sizeof(buffer),"AT+UPDATE=\"sequence\":\"%d%03d\",\"mode\":%d",millis(), millis() % 1000,MODE_RGB_STROBE);
   send_update_(buffer);
 }
-void sonoff_l1::set_mode_sync_to_music(int sensitive = 10, int speed = 50){
+
+void SonoffL1::set_mode_sync_to_music(int sensitive, int speed){
   if (!this->initialized_) return;
 
   char buffer[160];
   snprintf(buffer, sizeof(buffer),
-           "AT+UPDATE=\"sequence\":\"%d%03d\",\"mode\":%d,\"sensitive\":%d,\"speed\":%d",millis(), millis() % 1000,MODE_SYNC_TO_MUSIC,sensitive, speed);
+           "AT+UPDATE=\"sequence\":\"%d%03d\",\"mode\":%d,\"sensitive\":%d,\"speed\":%d",
+           millis(), millis() % 1000,MODE_SYNC_TO_MUSIC,sensitive, speed);
   send_update_(buffer);
 }
 
-void sonoff_l1::send_update_(const char *payload) {
+void SonoffL1::send_update_(const char *payload) {
   if (!this->initialized_) {
     ESP_LOGW(TAG, "Sonoff L1 not initialized yet, skipping send");
     return;
@@ -170,7 +182,6 @@ void sonoff_l1::send_update_(const char *payload) {
   this->write_str(payload);
   this->write_byte(0x1B);
 }
-
 
 }  // namespace sonoff_l1
 }  // namespace esphome
