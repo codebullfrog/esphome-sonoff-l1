@@ -64,7 +64,7 @@ void write_state(light::LightState *state) {
   send_update_(buffer);
 }
 
-light::LightTraits SonoffL1::get_traits() {
+light::LightTraits sonoff_l1::get_traits() {
   light::LightTraits traits;
   traits.set_supported_color_modes({light::ColorMode::RGB});
   return traits;
