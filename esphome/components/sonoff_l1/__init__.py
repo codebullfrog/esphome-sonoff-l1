@@ -12,8 +12,6 @@ MULTI_CONF = True
 ns = cg.esphome_ns.namespace("sonoff_l1")
 sonoff_l1 = ns.class_("sonoff_l1", cg.Component)
 
-from . import sonoff_l1
-
 CONF_SONOFF_L1_ID = "sonoff_l1_id"
 
 CONFIG_SCHEMA = light.LIGHT_SCHEMA.extend({
