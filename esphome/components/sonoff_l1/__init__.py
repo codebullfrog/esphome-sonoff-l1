@@ -20,8 +20,6 @@ CONFIG_SCHEMA = light.LIGHT_SCHEMA.extend({
     cv.Optional("effects"): cv.ensure_list(cv.Any()),
 })
 
-CONFIG_SCHEMA = light.register_light_platform("sonoff_l1", CONFIG_SCHEMA)
-
 async def to_code(config):
     var = cg.new_Pvariable(config[CONF_SONOFF_L1_ID])
     await cg.register_component(var, config)
