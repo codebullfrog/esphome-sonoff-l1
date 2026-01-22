@@ -10,12 +10,12 @@ MULTI_CONF = True
 
 # C++ namespace
 ns = cg.esphome_ns.namespace("sonoff_l1")
-sonoff_l1 = ns.class_("sonoff_l1", cg.Component, light.LightOutput, uart.UARTDevice)
+SonoffL1 = ns.class_("SonoffL1", cg.Component, light.LightOutput, uart.UARTDevice)
 
 CONF_SONOFF_L1_ID = "sonoff_l1_id"
 
 CONFIG_SCHEMA = light.LIGHT_SCHEMA.extend({
-    cv.GenerateID(CONF_SONOFF_L1_ID): cv.declare_id(sonoff_l1),
+    cv.GenerateID(CONF_SONOFF_L1_ID): cv.declare_id(SonoffL1),
     cv.GenerateID(uart.CONF_UART_ID): cv.use_id(uart.UARTComponent),
     cv.Optional("effects"): cv.ensure_list(cv.Any()),
 })
