@@ -5,17 +5,14 @@
 #include "esphome/core/log.h"
 #include "Arduino.h"
 
-# Namespace definition
 namespace esphome {
 namespace sonoff_l1 {
 
-class sonoff_l1 : public Component, public light::LightOutput, public uart::UARTDevice {
-//class sonoff_l1 : public Component {
+class SonoffL1 : public Component, public light::LightOutput, public uart::UARTDevice {
 
   public:
 
-      // Constructor -- SonoffL1() = default;
-      sonoff_l1();
+      SonoffL1();
 
       void setup() override;
 
@@ -25,7 +22,6 @@ class sonoff_l1 : public Component, public light::LightOutput, public uart::UART
 
       void dump_config() override;
 
-      // Effect methods (for use from YAML lambdas)
       void set_mode_colorful();
       void set_mode_colorful_gradient();
       void set_mode_colorful_breath();
@@ -40,7 +36,6 @@ class sonoff_l1 : public Component, public light::LightOutput, public uart::UART
       void set_mode_sync_to_music(int sensitive = 10, int speed = 50);
 
   protected:
-    # Internal fields definition
     void send_update_(const char *payload);
     bool initialized_{false};
 
@@ -48,5 +43,5 @@ class sonoff_l1 : public Component, public light::LightOutput, public uart::UART
 
 };
 
-}  //namespace sphome-sonoff-l1
-}  //namespace esphome
+}  // namespace sonoff_l1
+}  // namespace esphome
