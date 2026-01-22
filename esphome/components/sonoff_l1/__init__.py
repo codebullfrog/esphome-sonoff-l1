@@ -1,6 +1,6 @@
 import esphome.config_validation as cv
 import esphome.codegen as cg
-from esphome.components import light, uart 
+from esphome.components import light, uart
 from esphome.const import CONF_ID
 
 CODEOWNERS = ["@codebullfrog"]
@@ -17,9 +17,10 @@ CONF_SONOFF_L1_ID = "sonoff_l1_id"
 CONFIG_SCHEMA = light.LIGHT_SCHEMA.extend({
     cv.GenerateID(CONF_SONOFF_L1_ID): cv.declare_id(sonoff_l1),
     cv.GenerateID(uart.CONF_UART_ID): cv.use_id(uart.UARTComponent),
-    # Explicitly allow effects, but don’t enforce a specific schema
     cv.Optional("effects"): cv.ensure_list(cv.Any()),
 })
+
+CONFIG_SCHEMA = light.register_light_platform("sonoff_l1", CONFIG_SCHEMA)
 
 async def to_code(config):
     var = cg.new_Pvariable(config[CONF_SONOFF_L1_ID])
