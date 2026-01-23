@@ -71,7 +71,6 @@ light::LightTraits SonoffL1::get_traits() {
 
 void SonoffL1::dump_config() {
   ESP_LOGCONFIG(TAG, "Sonoff L1:");
-  LOG_LIGHT("  ", "Light", this->state_);
   this->check_uart_settings(9600);
 }
 
