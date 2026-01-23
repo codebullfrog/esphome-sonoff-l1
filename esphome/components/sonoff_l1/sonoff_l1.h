@@ -8,7 +8,7 @@
 namespace esphome {
 namespace sonoff_l1 {
 
-class SonoffL1 : public Component, public light::LightOutput, public uart::UARTDevice {
+class SonoffL1 : public light::LightOutput, public uart::UARTDevice {
 
   public:
 
