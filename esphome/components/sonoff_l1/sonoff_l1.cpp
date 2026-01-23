@@ -49,6 +49,7 @@ void SonoffL1::write_state(light::LightState *state) {
   state->current_values_as_brightness(&brightness_percent);
   int brightness = int(brightness_percent * 100.0f);
 
+  // Build and send the command
   char buffer[180];
   snprintf(buffer, sizeof(buffer),
            "AT+UPDATE=\"sequence\":\"%d%03d\",\"switch\":\"%s\",\"light_type\":1,"
@@ -61,6 +62,9 @@ void SonoffL1::write_state(light::LightState *state) {
 
   ESP_LOGD(TAG, "Sending state update: %s", buffer);
   send_update_(buffer);
+  
+  // Add a small delay to ensure the command is processed
+  delay(10);
 }
 
 light::LightTraits SonoffL1::get_traits() {
@@ -180,6 +184,7 @@ void SonoffL1::send_update_(const char *payload) {
   ESP_LOGV(TAG, "UART TX: %s", payload);
   this->write_str(payload);
   this->write_byte(0x1B);
+  this->flush();
 }
 
 }  // namespace sonoff_l1
