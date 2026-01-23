@@ -24,7 +24,7 @@ SonoffL1::SonoffL1() {
 }
 
 void SonoffL1::setup() { 
-  ESP_LOGI(TAG, "Initializing Sonoff L1 UART");
+  ESP_LOGCONFIG(TAG, "Setting up Sonoff L1...");
   this->initialized_ = true;
 }  
 
@@ -70,9 +70,9 @@ light::LightTraits SonoffL1::get_traits() {
 }
 
 void SonoffL1::dump_config() {
-  ESP_LOGCONFIG(TAG, "Sonoff L1 Light:");
-  LOG_UART(" ", "UART", this);
-  LOG_LIGHT(" ", "Light", this);
+  ESP_LOGCONFIG(TAG, "Sonoff L1:");
+  LOG_LIGHT("  ", "Light", this->state_);
+  this->check_uart_settings(9600);
 }
 
 void SonoffL1::set_mode_colorful(){
