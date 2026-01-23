@@ -64,7 +64,7 @@ void SonoffL1::write_state(light::LightState *state) {
   send_update_(buffer);
   
   // Add a small delay to ensure the command is processed
-  delay(10);
+  //delay(10);
 }
 
 light::LightTraits SonoffL1::get_traits() {
