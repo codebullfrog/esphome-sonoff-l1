@@ -10,7 +10,6 @@ ns = cg.esphome_ns.namespace("sonoff_l1")
 SonoffL1 = ns.class_("SonoffL1", light.LightOutput, uart.UARTDevice)
 
 CONFIG_SCHEMA = light.LIGHT_SCHEMA.extend({
-    cv.GenerateID(): cv.declare_id(SonoffL1),
     cv.Required(uart.CONF_UART_ID): cv.use_id(uart.UARTComponent),
 })
 
