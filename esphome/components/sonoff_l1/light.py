@@ -1,7 +1,7 @@
 import esphome.codegen as cg
 import esphome.config_validation as cv
 from esphome.components import light, uart
-from esphome.const import CONF_OUTPUT_ID, CONF_EFFECTS
+from esphome.const import CONF_OUTPUT_ID, CONF_NAME
 
 CODEOWNERS = ["@codebullfrog"]
 DEPENDENCIES = ["uart"]
@@ -26,120 +26,6 @@ SyncToMusicEffect = sonoff_l1_ns.class_("SyncToMusicEffect", light.LightEffect)
 CONF_SENSITIVE = "sensitive"
 CONF_SPEED = "speed"
 
-@light.register_effect(
-    "sonoff_l1.colorful",
-    ColorfulEffect,
-    "Colorful",
-    {}
-)
-async def colorful_effect_to_code(config, effect_id):
-    return cg.new_Pvariable(effect_id, config["name"])
-
-@light.register_effect(
-    "sonoff_l1.colorful_gradient",
-    ColorfulGradientEffect,
-    "Colorful Gradient",
-    {}
-)
-async def colorful_gradient_effect_to_code(config, effect_id):
-    return cg.new_Pvariable(effect_id, config["name"])
-
-@light.register_effect(
-    "sonoff_l1.colorful_breath",
-    ColorfulBreathEffect,
-    "Colorful Breath",
-    {}
-)
-async def colorful_breath_effect_to_code(config, effect_id):
-    return cg.new_Pvariable(effect_id, config["name"])
-
-@light.register_effect(
-    "sonoff_l1.diy_gradient",
-    DiyGradientEffect,
-    "DIY Gradient",
-    {}
-)
-async def diy_gradient_effect_to_code(config, effect_id):
-    return cg.new_Pvariable(effect_id, config["name"])
-
-@light.register_effect(
-    "sonoff_l1.diy_pulse",
-    DiyPulseEffect,
-    "DIY Pulse",
-    {}
-)
-async def diy_pulse_effect_to_code(config, effect_id):
-    return cg.new_Pvariable(effect_id, config["name"])
-
-@light.register_effect(
-    "sonoff_l1.diy_breath",
-    DiyBreathEffect,
-    "DIY Breath",
-    {}
-)
-async def diy_breath_effect_to_code(config, effect_id):
-    return cg.new_Pvariable(effect_id, config["name"])
-
-@light.register_effect(
-    "sonoff_l1.diy_strobe",
-    DiyStrobeEffect,
-    "DIY Strobe",
-    {}
-)
-async def diy_strobe_effect_to_code(config, effect_id):
-    return cg.new_Pvariable(effect_id, config["name"])
-
-@light.register_effect(
-    "sonoff_l1.rgb_gradient",
-    RgbGradientEffect,
-    "RGB Gradient",
-    {}
-)
-async def rgb_gradient_effect_to_code(config, effect_id):
-    return cg.new_Pvariable(effect_id, config["name"])
-
-@light.register_effect(
-    "sonoff_l1.rgb_pulse",
-    RgbPulseEffect,
-    "RGB Pulse",
-    {}
-)
-async def rgb_pulse_effect_to_code(config, effect_id):
-    return cg.new_Pvariable(effect_id, config["name"])
-
-@light.register_effect(
-    "sonoff_l1.rgb_breath",
-    RgbBreathEffect,
-    "RGB Breath",
-    {}
-)
-async def rgb_breath_effect_to_code(config, effect_id):
-    return cg.new_Pvariable(effect_id, config["name"])
-
-@light.register_effect(
-    "sonoff_l1.rgb_strobe",
-    RgbStrobeEffect,
-    "RGB Strobe",
-    {}
-)
-async def rgb_strobe_effect_to_code(config, effect_id):
-    return cg.new_Pvariable(effect_id, config["name"])
-
-@light.register_effect(
-    "sonoff_l1.sync_to_music",
-    SyncToMusicEffect,
-    "Sync to Music",
-    {
-        cv.Optional(CONF_SENSITIVE, default=10): cv.int_range(min=1, max=100),
-        cv.Optional(CONF_SPEED, default=50): cv.int_range(min=1, max=100),
-    }
-)
-async def sync_to_music_effect_to_code(config, effect_id):
-    effect = cg.new_Pvariable(effect_id, config["name"])
-    cg.add(effect.set_sensitive(config[CONF_SENSITIVE]))
-    cg.add(effect.set_speed(config[CONF_SPEED]))
-    return effect
-
 CONFIG_SCHEMA = light.RGB_LIGHT_SCHEMA.extend(
     {
         cv.GenerateID(CONF_OUTPUT_ID): cv.declare_id(SonoffL1),
@@ -151,3 +37,60 @@ async def to_code(config):
     await cg.register_component(var, config)
     await light.register_light(var, config)
     await uart.register_uart_device(var, config)
+
+# Register custom effects
+EFFECTS_REGISTRY = light.EFFECTS_REGISTRY
+
+@EFFECTS_REGISTRY.register("sonoff_l1.colorful", ColorfulEffect, "Colorful", {})
+async def colorful_effect_to_code(config, effect_id):
+    return cg.new_Pvariable(effect_id, config[CONF_NAME])
+
+@EFFECTS_REGISTRY.register("sonoff_l1.colorful_gradient", ColorfulGradientEffect, "Colorful Gradient", {})
+async def colorful_gradient_effect_to_code(config, effect_id):
+    return cg.new_Pvariable(effect_id, config[CONF_NAME])
+
+@EFFECTS_REGISTRY.register("sonoff_l1.colorful_breath", ColorfulBreathEffect, "Colorful Breath", {})
+async def colorful_breath_effect_to_code(config, effect_id):
+    return cg.new_Pvariable(effect_id, config[CONF_NAME])
+
+@EFFECTS_REGISTRY.register("sonoff_l1.diy_gradient", DiyGradientEffect, "DIY Gradient", {})
+async def diy_gradient_effect_to_code(config, effect_id):
+    return cg.new_Pvariable(effect_id, config[CONF_NAME])
+
+@EFFECTS_REGISTRY.register("sonoff_l1.diy_pulse", DiyPulseEffect, "DIY Pulse", {})
+async def diy_pulse_effect_to_code(config, effect_id):
+    return cg.new_Pvariable(effect_id, config[CONF_NAME])
+
+@EFFECTS_REGISTRY.register("sonoff_l1.diy_breath", DiyBreathEffect, "DIY Breath", {})
+async def diy_breath_effect_to_code(config, effect_id):
+    return cg.new_Pvariable(effect_id, config[CONF_NAME])
+
+@EFFECTS_REGISTRY.register("sonoff_l1.diy_strobe", DiyStrobeEffect, "DIY Strobe", {})
+async def diy_strobe_effect_to_code(config, effect_id):
+    return cg.new_Pvariable(effect_id, config[CONF_NAME])
+
+@EFFECTS_REGISTRY.register("sonoff_l1.rgb_gradient", RgbGradientEffect, "RGB Gradient", {})
+async def rgb_gradient_effect_to_code(config, effect_id):
+    return cg.new_Pvariable(effect_id, config[CONF_NAME])
+
+@EFFECTS_REGISTRY.register("sonoff_l1.rgb_pulse", RgbPulseEffect, "RGB Pulse", {})
+async def rgb_pulse_effect_to_code(config, effect_id):
+    return cg.new_Pvariable(effect_id, config[CONF_NAME])
+
+@EFFECTS_REGISTRY.register("sonoff_l1.rgb_breath", RgbBreathEffect, "RGB Breath", {})
+async def rgb_breath_effect_to_code(config, effect_id):
+    return cg.new_Pvariable(effect_id, config[CONF_NAME])
+
+@EFFECTS_REGISTRY.register("sonoff_l1.rgb_strobe", RgbStrobeEffect, "RGB Strobe", {})
+async def rgb_strobe_effect_to_code(config, effect_id):
+    return cg.new_Pvariable(effect_id, config[CONF_NAME])
+
+@EFFECTS_REGISTRY.register("sonoff_l1.sync_to_music", SyncToMusicEffect, "Sync to Music", {
+    cv.Optional(CONF_SENSITIVE, default=10): cv.int_range(min=1, max=100),
+    cv.Optional(CONF_SPEED, default=50): cv.int_range(min=1, max=100),
+})
+async def sync_to_music_effect_to_code(config, effect_id):
+    effect = cg.new_Pvariable(effect_id, config[CONF_NAME])
+    cg.add(effect.set_sensitive(config[CONF_SENSITIVE]))
+    cg.add(effect.set_speed(config[CONF_SPEED]))
+    return effect
