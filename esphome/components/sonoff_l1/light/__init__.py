@@ -16,7 +16,6 @@ CONFIG_SCHEMA = light.LIGHT_SCHEMA.extend({
 
 async def to_code(config):
     var = cg.new_Pvariable(config[CONF_ID])
-    await cg.register_component(var, config)
     await light.register_light(var, config)
     uart_component = await cg.get_variable(config[uart.CONF_UART_ID])
     cg.add(var.set_uart_parent(uart_component))
