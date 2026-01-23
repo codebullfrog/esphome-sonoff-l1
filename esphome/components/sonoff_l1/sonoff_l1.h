@@ -2,13 +2,13 @@
 
 #include "esphome/core/component.h"
 #include "esphome/components/light/light_output.h"
+#include "esphome/components/uart/uart.h"
 #include "esphome/core/log.h"
-#include "Arduino.h"
 
 namespace esphome {
 namespace sonoff_l1 {
 
-class SonoffL1 : public light::LightOutput, public uart::UARTDevice {
+class SonoffL1 : public light::LightOutput, public uart::UARTDevice, public Component {
 
   public:
 
