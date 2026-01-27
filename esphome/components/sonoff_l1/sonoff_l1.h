@@ -23,7 +23,7 @@ class SonoffL1 : public light::LightOutput, public uart::UARTDevice, public Comp
       void dump_config() override;
 
       void set_mode_colorful();
-      void set_mode_colorful_gradient(c_str mode);
+      void set_mode_colorful_gradient();
       void set_mode_colorful_breath();
       void set_mode_diy_gradient();
       void set_mode_diy_pulse();
