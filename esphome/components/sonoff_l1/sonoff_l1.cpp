@@ -80,14 +80,6 @@ void SonoffL1::dump_config() {
   this->check_uart_settings(9600);
 }
 
-void SonoffL1::set_mode(light::Lighteffect newMode) {
-  if (!this->initialized_) return;
-
-  char buffer[120];
-  snprintf(buffer, sizeof(buffer),"AT+UPDATE=\"sequence\":\"%d%03d\",\"mode\":%d",millis(), millis() % 1000,newMode);
-  send_update_(buffer);
-}
-
 void SonoffL1::set_mode_colorful(){
   if (!this->initialized_) return;
 
