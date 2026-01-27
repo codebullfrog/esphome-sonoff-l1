@@ -6,18 +6,20 @@ namespace sonoff_l1 {
 
 static const char *const TAG = "sonoff_l1";
 
-static const int MODE_COLORFUL = 1;
-static const int MODE_COLORFUL_GRADIENT = 2;
-static const int MODE_COLORFUL_BREATH = 3;
-static const int MODE_DIY_GRADIENT = 4;
-static const int MODE_DIY_PULSE = 5;
-static const int MODE_DIY_BREATH = 6;
-static const int MODE_DIY_STROBE = 7;
-static const int MODE_RGB_GRADIENT = 8;
-static const int MODE_RGB_PULSE = 9;
-static const int MODE_RGB_BREATH = 10;
-static const int MODE_RGB_STROBE = 11;
-static const int MODE_SYNC_TO_MUSIC = 12;
+#define SONOFF_L1_MODE_COLORFUL           1  // [Color key] Colorful (static color)
+#define SONOFF_L1_MODE_COLORFUL_GRADIENT  2  // [SMOOTH] Colorful Gradient
+#define SONOFF_L1_MODE_COLORFUL_BREATH    3  // [FADE] Colorful Breath
+#define SONOFF_L1_MODE_DIY_GRADIENT       4  // DIY Gradient (fade in and out) [Speed 1- 100, color]
+#define SONOFF_L1_MODE_DIY_PULSE          5  // DIY Pulse  (faster fade in and out) [Speed 1- 100, color]
+#define SONOFF_L1_MODE_DIY_BREATH         6  // DIY Breath (toggle on/off) [Speed 1- 100, color]
+#define SONOFF_L1_MODE_DIY_STROBE         7  // DIY Strobe (faster toggle on/off) [Speed 1- 100, color]
+#define SONOFF_L1_MODE_RGB_GRADIENT       8  // RGB Gradient
+#define SONOFF_L1_MODE_RGB_PULSE          9  // [STROBE] RGB Pulse
+#define SONOFF_L1_MODE_RGB_BREATH        10  // RGB Breath
+#define SONOFF_L1_MODE_RGB_STROBE        11  // [FLASH] RGB strobe
+#define SONOFF_L1_MODE_SYNC_TO_MUSIC     12  // Sync to music [Speed 1- 100, sensitivity 1 - 10]
+
+int mode = SONOFF_L1_MODE_COLORFUL;
 
 SonoffL1::SonoffL1() {
 
@@ -58,7 +60,7 @@ void SonoffL1::write_state(light::LightState *state) {
            led_state ? "on" : "off",
            red_value, green_value, blue_value,
            brightness,
-           MODE_COLORFUL);
+           SONOFF_L1_MODE_COLORFUL);
 
   ESP_LOGD(TAG, "Sending state update: %s", buffer);
   send_update_(buffer);
@@ -82,7 +84,7 @@ void SonoffL1::set_mode_colorful(){
   if (!this->initialized_) return;
 
   char buffer[120];
-  snprintf(buffer, sizeof(buffer),"AT+UPDATE=\"sequence\":\"%d%03d\",\"mode\":%d",millis(), millis() % 1000,MODE_COLORFUL);
+  snprintf(buffer, sizeof(buffer),"AT+UPDATE=\"sequence\":\"%d%03d\",\"mode\":%d",millis(), millis() % 1000,SONOFF_L1_MODE_COLORFUL);
   send_update_(buffer);
 }
 
@@ -90,7 +92,7 @@ void SonoffL1::set_mode_colorful_gradient(){
   if (!this->initialized_) return;
 
   char buffer[120];
-  snprintf(buffer, sizeof(buffer),"AT+UPDATE=\"sequence\":\"%d%03d\",\"mode\":%d",millis(), millis() % 1000,MODE_COLORFUL_GRADIENT);
+  snprintf(buffer, sizeof(buffer),"AT+UPDATE=\"sequence\":\"%d%03d\",\"mode\":%d",millis(), millis() % 1000,SONOFF_L1_MODE_COLORFUL_GRADIENT);
   send_update_(buffer);
 }
 
@@ -98,7 +100,7 @@ void SonoffL1::set_mode_colorful_breath(){
   if (!this->initialized_) return;
 
   char buffer[120];
-  snprintf(buffer, sizeof(buffer),"AT+UPDATE=\"sequence\":\"%d%03d\",\"mode\":%d",millis(), millis() % 1000,MODE_COLORFUL_BREATH);
+  snprintf(buffer, sizeof(buffer),"AT+UPDATE=\"sequence\":\"%d%03d\",\"mode\":%d",millis(), millis() % 1000,SONOFF_L1_MODE_COLORFUL_BREATH);
   send_update_(buffer);
 }
 
@@ -106,7 +108,7 @@ void SonoffL1::set_mode_diy_gradient(){
   if (!this->initialized_) return;
 
   char buffer[120];
-  snprintf(buffer, sizeof(buffer),"AT+UPDATE=\"sequence\":\"%d%03d\",\"mode\":%d",millis(), millis() % 1000,MODE_DIY_GRADIENT);
+  snprintf(buffer, sizeof(buffer),"AT+UPDATE=\"sequence\":\"%d%03d\",\"mode\":%d",millis(), millis() % 1000,SONOFF_L1_MODE_DIY_GRADIENT);
   send_update_(buffer);
 }
 
@@ -114,7 +116,7 @@ void SonoffL1::set_mode_diy_pulse(){
   if (!this->initialized_) return;
 
   char buffer[120];
-  snprintf(buffer, sizeof(buffer),"AT+UPDATE=\"sequence\":\"%d%03d\",\"mode\":%d",millis(), millis() % 1000,MODE_DIY_PULSE);
+  snprintf(buffer, sizeof(buffer),"AT+UPDATE=\"sequence\":\"%d%03d\",\"mode\":%d",millis(), millis() % 1000,SONOFF_L1_MODE_DIY_PULSE);
   send_update_(buffer);
 }
 
@@ -122,7 +124,7 @@ void SonoffL1::set_mode_diy_breath(){
   if (!this->initialized_) return;
 
   char buffer[120];
-  snprintf(buffer, sizeof(buffer),"AT+UPDATE=\"sequence\":\"%d%03d\",\"mode\":%d",millis(), millis() % 1000,MODE_DIY_BREATH);
+  snprintf(buffer, sizeof(buffer),"AT+UPDATE=\"sequence\":\"%d%03d\",\"mode\":%d",millis(), millis() % 1000,SONOFF_L1_MODE_DIY_BREATH);
   send_update_(buffer);
 }
 
@@ -130,7 +132,7 @@ void SonoffL1::set_mode_diy_strobe(){
   if (!this->initialized_) return;
 
   char buffer[120];
-  snprintf(buffer, sizeof(buffer),"AT+UPDATE=\"sequence\":\"%d%03d\",\"mode\":%d",millis(), millis() % 1000,MODE_DIY_STROBE);
+  snprintf(buffer, sizeof(buffer),"AT+UPDATE=\"sequence\":\"%d%03d\",\"mode\":%d",millis(), millis() % 1000,SONOFF_L1_MODE_DIY_STROBE);
   send_update_(buffer);
 }
 
@@ -138,7 +140,7 @@ void SonoffL1::set_mode_rgb_gradient(){
   if (!this->initialized_) return;
 
   char buffer[120];
-  snprintf(buffer, sizeof(buffer),"AT+UPDATE=\"sequence\":\"%d%03d\",\"mode\":%d",millis(), millis() % 1000,MODE_RGB_GRADIENT);
+  snprintf(buffer, sizeof(buffer),"AT+UPDATE=\"sequence\":\"%d%03d\",\"mode\":%d",millis(), millis() % 1000,SONOFF_L1_MODE_RGB_GRADIENT);
   send_update_(buffer);
 }
 
@@ -146,7 +148,7 @@ void SonoffL1::set_mode_rgb_pulse(){
   if (!this->initialized_) return;
 
   char buffer[120];
-  snprintf(buffer, sizeof(buffer),"AT+UPDATE=\"sequence\":\"%d%03d\",\"mode\":%d",millis(), millis() % 1000,MODE_RGB_PULSE);
+  snprintf(buffer, sizeof(buffer),"AT+UPDATE=\"sequence\":\"%d%03d\",\"mode\":%d",millis(), millis() % 1000,SONOFF_L1_MODE_RGB_PULSE);
   send_update_(buffer);
 }
 
@@ -154,7 +156,7 @@ void SonoffL1::set_mode_rgb_breath(){
   if (!this->initialized_) return;
 
   char buffer[120];
-  snprintf(buffer, sizeof(buffer),"AT+UPDATE=\"sequence\":\"%d%03d\",\"mode\":%d",millis(), millis() % 1000,MODE_RGB_BREATH);
+  snprintf(buffer, sizeof(buffer),"AT+UPDATE=\"sequence\":\"%d%03d\",\"mode\":%d",millis(), millis() % 1000,SONOFF_L1_MODE_RGB_BREATH);
   send_update_(buffer);
 }
 
@@ -162,7 +164,7 @@ void SonoffL1::set_mode_rgb_strobe(){
   if (!this->initialized_) return;
 
   char buffer[120];
-  snprintf(buffer, sizeof(buffer),"AT+UPDATE=\"sequence\":\"%d%03d\",\"mode\":%d",millis(), millis() % 1000,MODE_RGB_STROBE);
+  snprintf(buffer, sizeof(buffer),"AT+UPDATE=\"sequence\":\"%d%03d\",\"mode\":%d",millis(), millis() % 1000,SONOFF_L1_MODE_RGB_STROBE);
   send_update_(buffer);
 }
 
@@ -172,7 +174,7 @@ void SonoffL1::set_mode_sync_to_music(int sensitive, int speed){
   char buffer[160];
   snprintf(buffer, sizeof(buffer),
            "AT+UPDATE=\"sequence\":\"%d%03d\",\"mode\":%d,\"sensitive\":%d,\"speed\":%d",
-           millis(), millis() % 1000,MODE_SYNC_TO_MUSIC,sensitive, speed);
+           millis(), millis() % 1000,SONOFF_L1_MODE_SYNC_TO_MUSIC,sensitive, speed);
   send_update_(buffer);
 }
 
