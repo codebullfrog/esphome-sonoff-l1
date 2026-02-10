@@ -11,7 +11,10 @@ sonoff_l1_ns = cg.esphome_ns.namespace("sonoff_l1")
 SonoffL1 = sonoff_l1_ns.class_(
     "SonoffL1", light.LightOutput, uart.UARTDevice, cg.Component
 )
-SonoffL1Effect = sonoff_l1_ns.class_("SonoffL1Effect", light.LightEffect)
+
+light_ns = cg.esphome_ns.namespace("light")
+LightEffect = light_ns.class_("LightEffect")
+SonoffL1Effect = sonoff_l1_ns.class_("SonoffL1Effect", LightEffect)
 
 CONF_MODE = "mode"
 CONF_SENSITIVITY = "sensitivity"
