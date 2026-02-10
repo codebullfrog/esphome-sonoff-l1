@@ -6,187 +6,104 @@ namespace sonoff_l1 {
 
 static const char *const TAG = "sonoff_l1";
 
-#define SONOFF_L1_MODE_COLORFUL           1  // [Color key] Colorful (static color)
-#define SONOFF_L1_MODE_COLORFUL_GRADIENT  2  // [SMOOTH] Colorful Gradient
-#define SONOFF_L1_MODE_COLORFUL_BREATH    3  // [FADE] Colorful Breath
-#define SONOFF_L1_MODE_DIY_GRADIENT       4  // DIY Gradient (fade in and out) [Speed 1- 100, color]
-#define SONOFF_L1_MODE_DIY_PULSE          5  // DIY Pulse  (faster fade in and out) [Speed 1- 100, color]
-#define SONOFF_L1_MODE_DIY_BREATH         6  // DIY Breath (toggle on/off) [Speed 1- 100, color]
-#define SONOFF_L1_MODE_DIY_STROBE         7  // DIY Strobe (faster toggle on/off) [Speed 1- 100, color]
-#define SONOFF_L1_MODE_RGB_GRADIENT       8  // RGB Gradient
-#define SONOFF_L1_MODE_RGB_PULSE          9  // [STROBE] RGB Pulse
-#define SONOFF_L1_MODE_RGB_BREATH        10  // RGB Breath
-#define SONOFF_L1_MODE_RGB_STROBE        11  // [FLASH] RGB strobe
-#define SONOFF_L1_MODE_SYNC_TO_MUSIC     12  // Sync to music [Speed 1- 100, sensitivity 1 - 10]
+// --- SonoffL1 ---
 
-int mode = SONOFF_L1_MODE_COLORFUL;
-
-SonoffL1::SonoffL1() {
-
-}
-
-void SonoffL1::setup() { 
+void SonoffL1::setup() {
   ESP_LOGCONFIG(TAG, "Setting up Sonoff L1...");
+  delay(900);  // Nuvoton MCU startup time
   this->initialized_ = true;
-}  
+}
 
 void SonoffL1::setup_state(light::LightState *state) {
   this->state_ = state;
 }
 
-void SonoffL1::write_state(light::LightState *state) {
-  if (!this->initialized_) return;
-
-  float red, green, blue;
-  state->current_values_as_rgb(&red, &green, &blue);
-
-  int red_value = int(red * 255.0f);
-  int green_value = int(green * 255.0f);
-  int blue_value = int(blue * 255.0f);
-
-  bool led_state;
-  state->current_values_as_binary(&led_state);
-
-  float brightness_percent;
-  state->current_values_as_brightness(&brightness_percent);
-  int brightness = int(brightness_percent * 100.0f);
-
-  // Build and send the command
-  char buffer[180];
-  snprintf(buffer, sizeof(buffer),
-           "AT+UPDATE=\"sequence\":\"%d%03d\",\"switch\":\"%s\",\"light_type\":1,"
-           "\"colorR\":%d,\"colorG\":%d,\"colorB\":%d,\"bright\":%d,\"mode\":%d",
-           millis(), millis() % 1000,
-           led_state ? "on" : "off",
-           red_value, green_value, blue_value,
-           brightness,
-           SONOFF_L1_MODE_COLORFUL);
-
-  ESP_LOGD(TAG, "Sending state update: %s", buffer);
-  send_update_(buffer);
-  
-  // Add a small delay to ensure the command is processed
-  //delay(10);
-}
-
 light::LightTraits SonoffL1::get_traits() {
-  light::LightTraits traits;
+  auto traits = light::LightTraits();
   traits.set_supported_color_modes({light::ColorMode::RGB});
   return traits;
 }
 
 void SonoffL1::dump_config() {
   ESP_LOGCONFIG(TAG, "Sonoff L1:");
-  this->check_uart_settings(9600);
+  this->check_uart_settings(19200);
 }
 
-void SonoffL1::set_mode_colorful(){
+void SonoffL1::set_mode(uint8_t mode) {
+  if (mode < 1 || mode > 12) return;
+  this->mode_ = mode;
+  this->send_command_();
+}
+
+void SonoffL1::write_state(light::LightState *state) {
   if (!this->initialized_) return;
-
-  char buffer[120];
-  snprintf(buffer, sizeof(buffer),"AT+UPDATE=\"sequence\":\"%d%03d\",\"mode\":%d",millis(), millis() % 1000,SONOFF_L1_MODE_COLORFUL);
-  send_update_(buffer);
+  this->send_command_();
 }
 
-void SonoffL1::set_mode_colorful_gradient(){
-  if (!this->initialized_) return;
+void SonoffL1::send_command_() {
+  if (!this->initialized_ || this->state_ == nullptr) return;
 
-  char buffer[120];
-  snprintf(buffer, sizeof(buffer),"AT+UPDATE=\"sequence\":\"%d%03d\",\"mode\":%d",millis(), millis() % 1000,SONOFF_L1_MODE_COLORFUL_GRADIENT);
-  send_update_(buffer);
-}
+  float red, green, blue;
+  this->state_->current_values_as_rgb(&red, &green, &blue);
 
-void SonoffL1::set_mode_colorful_breath(){
-  if (!this->initialized_) return;
+  bool power;
+  this->state_->current_values_as_binary(&power);
 
-  char buffer[120];
-  snprintf(buffer, sizeof(buffer),"AT+UPDATE=\"sequence\":\"%d%03d\",\"mode\":%d",millis(), millis() % 1000,SONOFF_L1_MODE_COLORFUL_BREATH);
-  send_update_(buffer);
-}
+  float bri;
+  this->state_->current_values_as_brightness(&bri);
 
-void SonoffL1::set_mode_diy_gradient(){
-  if (!this->initialized_) return;
+  char buf[200];
+  int len = snprintf(buf, sizeof(buf),
+      "AT+UPDATE=\"sequence\":\"%d%03d\",\"switch\":\"%s\",\"light_type\":1",
+      millis(), millis() % 1000, power ? "on" : "off");
 
-  char buffer[120];
-  snprintf(buffer, sizeof(buffer),"AT+UPDATE=\"sequence\":\"%d%03d\",\"mode\":%d",millis(), millis() % 1000,SONOFF_L1_MODE_DIY_GRADIENT);
-  send_update_(buffer);
-}
-
-void SonoffL1::set_mode_diy_pulse(){
-  if (!this->initialized_) return;
-
-  char buffer[120];
-  snprintf(buffer, sizeof(buffer),"AT+UPDATE=\"sequence\":\"%d%03d\",\"mode\":%d",millis(), millis() % 1000,SONOFF_L1_MODE_DIY_PULSE);
-  send_update_(buffer);
-}
-
-void SonoffL1::set_mode_diy_breath(){
-  if (!this->initialized_) return;
-
-  char buffer[120];
-  snprintf(buffer, sizeof(buffer),"AT+UPDATE=\"sequence\":\"%d%03d\",\"mode\":%d",millis(), millis() % 1000,SONOFF_L1_MODE_DIY_BREATH);
-  send_update_(buffer);
-}
-
-void SonoffL1::set_mode_diy_strobe(){
-  if (!this->initialized_) return;
-
-  char buffer[120];
-  snprintf(buffer, sizeof(buffer),"AT+UPDATE=\"sequence\":\"%d%03d\",\"mode\":%d",millis(), millis() % 1000,SONOFF_L1_MODE_DIY_STROBE);
-  send_update_(buffer);
-}
-
-void SonoffL1::set_mode_rgb_gradient(){
-  if (!this->initialized_) return;
-
-  char buffer[120];
-  snprintf(buffer, sizeof(buffer),"AT+UPDATE=\"sequence\":\"%d%03d\",\"mode\":%d",millis(), millis() % 1000,SONOFF_L1_MODE_RGB_GRADIENT);
-  send_update_(buffer);
-}
-
-void SonoffL1::set_mode_rgb_pulse(){
-  if (!this->initialized_) return;
-
-  char buffer[120];
-  snprintf(buffer, sizeof(buffer),"AT+UPDATE=\"sequence\":\"%d%03d\",\"mode\":%d",millis(), millis() % 1000,SONOFF_L1_MODE_RGB_PULSE);
-  send_update_(buffer);
-}
-
-void SonoffL1::set_mode_rgb_breath(){
-  if (!this->initialized_) return;
-
-  char buffer[120];
-  snprintf(buffer, sizeof(buffer),"AT+UPDATE=\"sequence\":\"%d%03d\",\"mode\":%d",millis(), millis() % 1000,SONOFF_L1_MODE_RGB_BREATH);
-  send_update_(buffer);
-}
-
-void SonoffL1::set_mode_rgb_strobe(){
-  if (!this->initialized_) return;
-
-  char buffer[120];
-  snprintf(buffer, sizeof(buffer),"AT+UPDATE=\"sequence\":\"%d%03d\",\"mode\":%d",millis(), millis() % 1000,SONOFF_L1_MODE_RGB_STROBE);
-  send_update_(buffer);
-}
-
-void SonoffL1::set_mode_sync_to_music(int sensitive, int speed){
-  if (!this->initialized_) return;
-
-  char buffer[160];
-  snprintf(buffer, sizeof(buffer),
-           "AT+UPDATE=\"sequence\":\"%d%03d\",\"mode\":%d,\"sensitive\":%d,\"speed\":%d",
-           millis(), millis() % 1000,SONOFF_L1_MODE_SYNC_TO_MUSIC,sensitive, speed);
-  send_update_(buffer);
-}
-
-void SonoffL1::send_update_(const char *payload) {
-  if (!this->initialized_) {
-    ESP_LOGW(TAG, "Sonoff L1 not initialized yet, skipping send");
-    return;
+  if (this->mode_ <= 7) {
+    len += snprintf(buf + len, sizeof(buf) - len,
+        ",\"colorR\":%d,\"colorG\":%d,\"colorB\":%d,\"bright\":%d",
+        (int)(red * 255), (int)(green * 255), (int)(blue * 255),
+        (int)(bri * 100));
+  } else if (this->mode_ <= 11) {
+    len += snprintf(buf + len, sizeof(buf) - len,
+        ",\"bright\":%d", (int)(bri * 100));
   }
-  ESP_LOGV(TAG, "UART TX: %s", payload);
+
+  len += snprintf(buf + len, sizeof(buf) - len, ",\"mode\":%d", this->mode_);
+
+  if (this->mode_ >= 4 && this->mode_ <= 7) {
+    len += snprintf(buf + len, sizeof(buf) - len,
+        ",\"speed\":%d", this->speed_);
+  }
+
+  if (this->mode_ == 12) {
+    len += snprintf(buf + len, sizeof(buf) - len,
+        ",\"sensitive\":%d,\"speed\":%d", this->sensitivity_, this->speed_);
+  }
+
+  ESP_LOGD(TAG, "TX: %s", buf);
+  this->send_raw_(buf);
+}
+
+void SonoffL1::send_raw_(const char *payload) {
   this->write_str(payload);
   this->write_byte(0x1B);
   this->flush();
+}
+
+// --- SonoffL1Effect ---
+
+SonoffL1Effect::SonoffL1Effect(const char *name, uint8_t mode)
+    : LightEffect(name), mode_(mode) {}
+
+void SonoffL1Effect::start() {
+  auto *out = static_cast<SonoffL1 *>(this->state_->get_output());
+  out->set_mode(this->mode_);
+}
+
+void SonoffL1Effect::apply() {}
+
+void SonoffL1Effect::stop() {
+  auto *out = static_cast<SonoffL1 *>(this->state_->get_output());
+  out->set_mode(SONOFF_L1_MODE_COLORFUL);
 }
 
 }  // namespace sonoff_l1

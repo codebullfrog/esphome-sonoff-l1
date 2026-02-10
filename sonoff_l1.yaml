@@ -1,0 +1,65 @@
+esphome:
+  name: sonoff-l1
+  platform: ESP8266
+  board: esp8285
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+api:
+ota:
+
+logger:
+  baud_rate: 0  # Disable serial logging — UART shared with Nuvoton MCU
+
+uart:
+  tx_pin: GPIO1
+  rx_pin: GPIO3
+  baud_rate: 19200
+
+external_components:
+  - source:
+      type: local
+      path: esphome/components
+
+light:
+  - platform: sonoff_l1
+    name: "LED Strip"
+    id: led_strip
+    speed: 50
+    sensitivity: 5
+    effects:
+      - sonoff_l1_mode:
+          name: "Colorful Gradient"
+          mode: "Colorful Gradient"
+      - sonoff_l1_mode:
+          name: "Colorful Breath"
+          mode: "Colorful Breath"
+      - sonoff_l1_mode:
+          name: "DIY Gradient"
+          mode: "DIY Gradient"
+      - sonoff_l1_mode:
+          name: "DIY Pulse"
+          mode: "DIY Pulse"
+      - sonoff_l1_mode:
+          name: "DIY Breath"
+          mode: "DIY Breath"
+      - sonoff_l1_mode:
+          name: "DIY Strobe"
+          mode: "DIY Strobe"
+      - sonoff_l1_mode:
+          name: "RGB Gradient"
+          mode: "RGB Gradient"
+      - sonoff_l1_mode:
+          name: "RGB Pulse"
+          mode: "RGB Pulse"
+      - sonoff_l1_mode:
+          name: "RGB Breath"
+          mode: "RGB Breath"
+      - sonoff_l1_mode:
+          name: "RGB Strobe"
+          mode: "RGB Strobe"
+      - sonoff_l1_mode:
+          name: "Sync to Music"
+          mode: "Sync to Music"
