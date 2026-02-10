@@ -2,45 +2,63 @@
 
 #include "esphome/core/component.h"
 #include "esphome/components/light/light_output.h"
+#include "esphome/components/light/light_effect.h"
 #include "esphome/components/uart/uart.h"
-#include "esphome/core/log.h"
 
 namespace esphome {
 namespace sonoff_l1 {
 
-class SonoffL1 : public light::LightOutput, public uart::UARTDevice, public Component {
+static const uint8_t SONOFF_L1_MODE_COLORFUL          =  1;
+static const uint8_t SONOFF_L1_MODE_COLORFUL_GRADIENT  =  2;
+static const uint8_t SONOFF_L1_MODE_COLORFUL_BREATH    =  3;
+static const uint8_t SONOFF_L1_MODE_DIY_GRADIENT       =  4;
+static const uint8_t SONOFF_L1_MODE_DIY_PULSE          =  5;
+static const uint8_t SONOFF_L1_MODE_DIY_BREATH         =  6;
+static const uint8_t SONOFF_L1_MODE_DIY_STROBE         =  7;
+static const uint8_t SONOFF_L1_MODE_RGB_GRADIENT       =  8;
+static const uint8_t SONOFF_L1_MODE_RGB_PULSE          =  9;
+static const uint8_t SONOFF_L1_MODE_RGB_BREATH         = 10;
+static const uint8_t SONOFF_L1_MODE_RGB_STROBE         = 11;
+static const uint8_t SONOFF_L1_MODE_SYNC_TO_MUSIC      = 12;
 
-  public:
+class SonoffL1 : public light::LightOutput,
+                 public uart::UARTDevice,
+                 public Component {
+ public:
+  void setup() override;
+  void dump_config() override;
+  void setup_state(light::LightState *state) override;
+  void write_state(light::LightState *state) override;
+  light::LightTraits get_traits() override;
 
-      SonoffL1();
+  void set_mode(uint8_t mode);
+  void set_speed(uint8_t speed) { this->speed_ = speed; }
+  void set_sensitivity(uint8_t sensitivity) { this->sensitivity_ = sensitivity; }
 
-      void setup() override;
+  uint8_t get_mode() const { return this->mode_; }
+  uint8_t get_speed() const { return this->speed_; }
+  uint8_t get_sensitivity() const { return this->sensitivity_; }
 
-      void setup_state(light::LightState *state) override;
-      void write_state(light::LightState *state) override;
-      light::LightTraits get_traits() override;
+ protected:
+  void send_command_();
+  void send_raw_(const char *payload);
 
-      void dump_config() override;
+  light::LightState *state_{nullptr};
+  bool initialized_{false};
+  uint8_t mode_{SONOFF_L1_MODE_COLORFUL};
+  uint8_t speed_{50};
+  uint8_t sensitivity_{5};
+};
 
-      void set_mode_colorful();
-      void set_mode_colorful_gradient();
-      void set_mode_colorful_breath();
-      void set_mode_diy_gradient();
-      void set_mode_diy_pulse();
-      void set_mode_diy_breath();
-      void set_mode_diy_strobe();
-      void set_mode_rgb_gradient();
-      void set_mode_rgb_pulse();
-      void set_mode_rgb_breath();
-      void set_mode_rgb_strobe();
-      void set_mode_sync_to_music(int sensitive = 10, int speed = 50);
+class SonoffL1Effect : public light::LightEffect {
+ public:
+  SonoffL1Effect(const char *name, uint8_t mode);
+  void apply() override;
+  void start() override;
+  void stop() override;
 
-  protected:
-    void send_update_(const char *payload);
-    bool initialized_{false};
-
-    light::LightState *state_ { nullptr };
-
+ protected:
+  uint8_t mode_;
 };
 
 }  // namespace sonoff_l1
